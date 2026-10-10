@@ -1,0 +1,158 @@
+
+# general settings
+
+name: Tiny_lr6e4_iter500000_light_SRx2_scratch
+
+model_type: PFTCovModel
+scale: 2
+num_gpu: 1
+manual_seed: 0
+
+# find_unused_parameters needs to be true, otherwise it will affect performance
+find_unused_parameters: true
+
+# dataset and data loader settings
+datasets:
+  train:
+    name: DIV2K
+    type: PairedImageDataset
+    dataroot_gt: /media/xuke/E26665286664FF23/ablation_study/dataset/DIV2K_train_HR
+    dataroot_lq: /media/xuke/E26665286664FF23/ablation_study/dataset/DIV2K_train_LR_bicubic/X2
+    filename_tmpl: '{}x2'
+    io_backend:
+      type: disk
+
+    gt_size: 128
+    use_hflip: true
+    use_rot: true
+
+    # data loader
+    num_worker_per_gpu: 20
+    batch_size_per_gpu: 10
+    dataset_enlarge_ratio: 1
+    prefetch_mode: cuda
+    pin_memory: True
+    persistent_workers: True
+
+
+  val_1:
+    name: Set5
+    type: PairedImageDataset
+    dataroot_gt: /media/xuke/E26665286664FF23/ablation_study/test_data/set5/GTmod12
+    dataroot_lq: /media/xuke/E26665286664FF23/ablation_study/test_data/set5/LRbicx2
+    io_backend:
+      type: disk
+
+  val_2:
+    name: Set14
+    type: PairedImageDataset
+    dataroot_gt: /media/xuke/E26665286664FF23/ablation_study/test_data/set14/GTmod12
+    dataroot_lq: /media/xuke/E26665286664FF23/ablation_study/test_data/set14/LRbicx2
+    io_backend:
+      type: disk
+
+  val_3:
+    name: BSD100
+    type: PairedImageDataset
+    dataroot_gt: /media/xuke/E26665286664FF23/ablation_study/test_data/BSDS100/GTmod12
+    dataroot_lq: /media/xuke/E26665286664FF23/ablation_study/test_data/BSDS100/LRbicx2
+    io_backend:
+      type: disk
+
+  val_4:
+    name: Urban100
+    type: PairedImageDataset
+    dataroot_gt: /media/xuke/E26665286664FF23/ablation_study/test_data/Urban100/GTmod12
+    dataroot_lq: /media/xuke/E26665286664FF23/ablation_study/test_data/Urban100/LRbicx2
+    io_backend:
+      type: disk
+
+  val_5:
+    name: Manga109
+    type: PairedImageDataset
+    dataroot_gt: /media/xuke/E26665286664FF23/ablation_study/test_data/Manga109/GTmod12
+    dataroot_lq: /media/xuke/E26665286664FF23/ablation_study/test_data/Manga109/LRbicx2
+    io_backend:
+      type: disk
+
+# network structures
+network_g:
+#  type: model_name
+  upscale: 2
+  patch_size: 1
+  in_chans: 3
+  img_size: 64
+  embed_dim: 40
+  depths: [3,3,3,3]
+  num_heads: [4,4,4,4]
+  reducted_dim: 8
+  num_tokens: 16
+  window_size: 24
+  convffn_kernel_size: 5
+  img_range: 1.
+  mlp_ratio: 1
+  upsampler: 'pixelshuffledirect'
+  resi_connection: '1conv'
+  use_checkpoint: false
+
+# path
+path:
+  pretrain_network_g: ~
+  strict_load_g: true
+  resume_state: ~
+# training settings
+train:
+  ema_decay: 0.999
+  optim_g:
+    type: AdamW
+    lr: !!float 6e-4
+    weight_decay: 0
+    betas: [0.9, 0.99]
+    td_lr_scale: 1.0
+
+  scheduler:
+    type: MultiStepLR
+    milestones: [250000, 400000, 450000, 475000, 490000]
+    gamma: 0.5
+
+  total_iter: 500000
+  warmup_iter: 2000
+
+  # losses
+  pixel_opt:
+    type: FFTLoss
+    FFTweight: 0.05
+    reduction: mean
+
+#  0 for tiny and real ; 0.1 for normal
+  lambda_cov: !!float 0.0
+# validation settings
+val:
+  val_freq: !!float 2e4
+  save_img: false
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: yes
+
+    ssim: # metric name, can be arbitrary
+      type: calculate_ssim
+      crop_border: 4
+      test_y_channel: yes
+
+# logging settings
+logger:
+  print_freq: 100
+  save_checkpoint_freq: !!float 2e4
+  use_tb_logger: true
+  wandb:
+    project: ~
+    resume_id: ~
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29500
+
