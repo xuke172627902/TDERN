@@ -3,7 +3,9 @@ models and codes for Token Dictionary Expanded Effective Receptive Field Network
 The code is constructed based on BasicSR, PFT, ESC. Thanks for their great work.
 
 BasicSR: https://github.com/XPixelGroup/BasicSR
+
 PFT: https://github.com/CVL-UESTC/PFT-SR
+
 ESC: https://github.com/dslisleedh/ESC
 
 Before any testing or reproducing, make sure the installation and the datasets preparation are done correctly.
