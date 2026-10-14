@@ -36,6 +36,7 @@ test_data:
 
 Set5, Set14, BSDS100, Urban100, Manga109, RealSRSet
 
-Pretrained model is avaialbe now at https://pan.baidu.com/s/13bJrmvxlz03OUZVxctiehw?pwd=7ei6. (password: 7ei6)
+Pretrained model is avaialbe now at https://pan.baidu.com/s/1MP_3EFC-aJx-cA08mZ3HVQ?pwd=ae8e (password: ae8e) 
+
 
 
